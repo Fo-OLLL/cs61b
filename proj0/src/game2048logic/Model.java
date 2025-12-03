@@ -3,6 +3,7 @@ package game2048logic;
 import game2048rendering.Board;
 import game2048rendering.Side;
 import game2048rendering.Tile;
+import net.sf.saxon.functions.ConstantFunction;
 
 import java.util.Formatter;
 
@@ -84,7 +85,13 @@ public class Model {
      *  Empty spaces are stored as null.
      * */
     public boolean emptySpaceExists() {
-        // TODO: Task 2. Fill in this function.
+        for(int i=0;i<board.size();i++){
+            for(int j=0;j<board.size();j++){
+                if(board.tile(i,j)==null){
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -94,24 +101,51 @@ public class Model {
      * given a Tile object t, we get its value with t.value().
      */
     public boolean maxTileExists() {
-        // TODO: Task 3. Fill in this function.
+        int max_num=2048;
+        for(int i=0;i<board.size();i++) {
+            for (int j = 0; j < board.size(); j++) {
+                if(board.tile(i,j)==null){
+                    continue;
+                }
+                if (board.tile(i, j).value()==max_num) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
-    /**
+    /**Question2
      * Returns true if there are any valid moves on the board.
      * There are two ways that there can be valid moves:
      * 1. There is at least one empty space on the board.
      * 2. There are two adjacent tiles with the same value.
      */
     public boolean atLeastOneMoveExists() {
-        // TODO: Fill in this function.
+        if (emptySpaceExists()) {
+            return true;
+        } else {
+            for (int x = 0; x < board.size(); x++) {
+                for (int y = 0; y < board.size(); y++) {
+                    if(x<board.size()-1){
+                        if(board.tile(x,y).value()==board.tile(x+1,y).value()){
+                            return true;
+                        }
+                    }
+                    if(y<board.size()-1){
+                        if(board.tile(x,y).value()==board.tile(x,y+1).value()){
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
         return false;
     }
 
+
     /**
      * Moves the tile at position (x, y) as far up as possible.
-     *
      * Rules for Tilt:
      * 1. If two Tiles are adjacent in the direction of motion and have
      *    the same value, they are merged into one Tile of twice the original
@@ -127,8 +161,17 @@ public class Model {
         Tile currTile = board.tile(x, y);
         int myValue = currTile.value();
         int targetY = y;
+        while(targetY<board.size()-1&&(board.tile(x,targetY+1)==null || (myValue==board.tile(x,targetY+1).value()&&(!board.tile(x,targetY+1).wasMerged())))){
+            targetY++;
+        }
+        if(targetY==y){
+            return;
+        }
+        board.move(x,targetY,currTile);
+        if (board.tile(x,targetY).wasMerged()){
+            score+=board.tile(x,targetY).value();
+        }
 
-        // TODO: Tasks 5, 6, and 10. Fill in this function.
     }
 
     /** Handles the movements of the tilt in column x of the board
@@ -137,11 +180,22 @@ public class Model {
      * so we are tilting the tiles in this column up.
      * */
     public void tiltColumn(int x) {
-        // TODO: Task 7. Fill in this function.
+        for(int y=board.size()-2;y>=0;y--){
+            if(board.tile(x,y)==null){
+                continue;
+            }
+            else{
+                moveTileUpAsFarAsPossible(x,y);
+            }
+        }
     }
 
     public void tilt(Side side) {
-        // TODO: Tasks 8 and 9. Fill in this function.
+        board.setViewingPerspective(side);
+        for(int x=0;x<board.size();x++){
+            tiltColumn(x);
+        }
+        board.setViewingPerspective(Side.NORTH);
     }
 
     /** Tilts every column of the board toward SIDE.

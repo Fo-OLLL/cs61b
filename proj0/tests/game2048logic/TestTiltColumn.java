@@ -22,9 +22,9 @@ public class TestTiltColumn {
     @GradedTest(number = "11.1")
     public void testNoMergeColumn() {
         int[][] board = {
-                {0, 0, 0, 0},
-                {0, 0, 0, 0},
                 {4, 0, 0, 0},
+                {2, 0, 0, 0},
+                {0, 0, 0, 0},
                 {2, 0, 0, 0}
         };
         Model before = new Model(board, 0);
@@ -32,12 +32,12 @@ public class TestTiltColumn {
 
         int[][] result = {
                 {4, 0, 0, 0},
-                {2, 0, 0, 0},
+                {4, 0, 0, 0},
                 {0, 0, 0, 0},
                 {0, 0, 0, 0}
         };
 
-        Model after = new Model(result, 0);
+        Model after = new Model(result, 4);
         assertWithMessage("Boards should match:").that(before.toString()).isEqualTo(after.toString());
     }
 
