@@ -2,7 +2,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LinkedListDeque61B<T> implements Deque61B<T>{
-    Note sentinel;
+    private Note sentinel;
+    private int size;
 
     public class Note{
         T item;
@@ -10,9 +11,11 @@ public class LinkedListDeque61B<T> implements Deque61B<T>{
         Note pre;
     }
     public LinkedListDeque61B(){
-        Note sentinel=new Note();
+        sentinel=new Note();
         sentinel.next=sentinel;
         sentinel.pre=sentinel;
+        size=0;
+        ind=sentinel;
     }
     @Override
     public void addFirst(Object x) {
@@ -23,6 +26,7 @@ public class LinkedListDeque61B<T> implements Deque61B<T>{
 
         nx.pre=sentinel;
         sentinel.next=nx;
+        this.size++;
     }
 
     @Override
@@ -34,6 +38,7 @@ public class LinkedListDeque61B<T> implements Deque61B<T>{
 
         nx.next=sentinel;
         sentinel.pre=nx;
+        this.size++;
     }
 
     @Override
@@ -49,7 +54,7 @@ public class LinkedListDeque61B<T> implements Deque61B<T>{
 
     @Override
     public boolean isEmpty() {
-        if(sentinel.next==sentinel)return true;
+        return size==0;
     }
 
     @Override
@@ -64,22 +69,55 @@ public class LinkedListDeque61B<T> implements Deque61B<T>{
     }
 
     @Override
-    public Object removeFirst() {
-        return null;
+    public T removeFirst() {
+        if (sentinel.next==sentinel){
+            return null;
+        }
+        Note del=sentinel.next;
+        sentinel.next=del.next;
+        del.next.pre=sentinel;
+        del.next = null; del.pre = null;
+        this.size--;
+        return del.item;
+
     }
 
     @Override
-    public Object removeLast() {
-        return null;
+    public T removeLast() {
+        if (sentinel.pre==sentinel){
+            return null;
+        }
+        Note del=sentinel.pre;
+        sentinel.pre=del.pre;
+        del.pre.next=sentinel;
+        del.next = null; del.pre = null;
+        this.size--;
+        return del.item;
     }
 
     @Override
-    public Object get(int index) {
-        return null;
+    public T get(int index) {
+        Note n=sentinel;
+        while(0<=index&&index<size){
+             n=n.next;
+             index--;
+        }
+        return n.item;
     }
 
+    Note ind=sentinel;
     @Override
-    public Object getRecursive(int index) {
-        return null;
+    public T getRecursive(int index) {
+        if(index>=size||index<0){
+            ind = sentinel;
+            return null;
+        }
+        ind=ind.next;
+        if (index==0){
+            T a=ind.item;
+            ind=sentinel;
+            return a;
+        }
+        return  getRecursive(index-1);
     }
 }
